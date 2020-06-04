@@ -46,6 +46,7 @@ from tf_agents.drivers import dynamic_episode_driver
 from tf_agents.environments import suite_gym
 from tf_agents.environments import tf_py_environment
 from tf_agents.environments.examples import masked_cartpole  # pylint: disable=unused-import
+from tf_agents.environments.examples import load_balance_test  # pylint: disable=unused-import
 from tf_agents.eval import metric_utils
 from tf_agents.metrics import py_metrics
 from tf_agents.metrics import tf_metrics

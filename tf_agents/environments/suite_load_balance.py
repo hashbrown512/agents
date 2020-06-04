@@ -24,6 +24,9 @@ from the environment specs and utilize our TimeLimit wrapper.
 """
 import gin
 import gym
+from gym.envs.registration import register
+from gym.envs.registration import register
+from load_balance.load_balance import LoadBalanceEnv
 
 from tf_agents.environments import gym_wrapper
 from tf_agents.environments import wrappers
@@ -59,11 +62,15 @@ def load(environment_name,
   Returns:
     A PyEnvironment instance.
   """
+
+  print("About to GYM SPEC")
   gym_spec = gym.spec(environment_name)
+  print("About to MAKE")
   gym_env = gym_spec.make()
 
   if max_episode_steps is None and gym_spec.max_episode_steps is not None:
     max_episode_steps = gym_spec.max_episode_steps
+    print("max episode steps from gym spec", max_episode_steps)
 
   return wrap_env(
       gym_env,
@@ -123,6 +130,7 @@ def wrap_env(gym_env,
 
   if max_episode_steps is not None and max_episode_steps > 0:
     env = time_limit_wrapper(env, max_episode_steps)
+    print("Time limit wrapper", max_episode_steps)
 
   for wrapper in env_wrappers:
     env = wrapper(env)

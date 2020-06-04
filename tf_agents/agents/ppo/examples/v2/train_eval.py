@@ -1,4 +1,4 @@
-# coding=utf-8
+ # coding=utf-8
 # Copyright 2018 The TF-Agents Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,8 +21,13 @@ To run:
 tensorboard --logdir $HOME/tmp/ppo/gym/HalfCheetah-v2/ --port 2223 &
 
 python tf_agents/agents/ppo/examples/v2/train_eval.py \
-  --root_dir=$HOME/tmp/ppo/gym/HalfCheetah-v2/ \
+  --root_dir=logs/LoadBalanceDefault-v0/ \
   --logtostderr
+  
+python tf_agents/agents/ppo/examples/v2/train_eval.py \
+  --root_dir=logs/LoadBalanceDefault-v0/run1 \
+  --logtostderr
+  
 ```
 """
 
@@ -39,11 +44,12 @@ from absl import logging
 
 import gin
 import tensorflow as tf  # pylint: disable=g-explicit-tensorflow-version-import
-
+from tf_agents.environments.load_balance import load_balance # pylint: disable=unused-import
 from tf_agents.agents.ppo import ppo_agent
 from tf_agents.drivers import dynamic_episode_driver
 from tf_agents.environments import parallel_py_environment
-from tf_agents.environments import suite_mujoco
+from tf_agents.environments import suite_gym
+# from tf_agents.environments import suite_load_balance
 from tf_agents.environments import tf_py_environment
 from tf_agents.eval import metric_utils
 from tf_agents.metrics import tf_metrics
@@ -58,21 +64,21 @@ from tf_agents.utils import common
 
 flags.DEFINE_string('root_dir', os.getenv('TEST_UNDECLARED_OUTPUTS_DIR'),
                     'Root directory for writing logs/summaries/checkpoints.')
-flags.DEFINE_string('env_name', 'HalfCheetah-v2', 'Name of an environment')
-flags.DEFINE_integer('replay_buffer_capacity', 1001,
+flags.DEFINE_string('env_name', 'LoadBalanceDefault-v0', 'Name of an environment')
+flags.DEFINE_integer('replay_buffer_capacity', 20001,
                      'Replay buffer capacity per env.')
-flags.DEFINE_integer('num_parallel_environments', 30,
+flags.DEFINE_integer('num_parallel_environments', 6,
                      'Number of environments to run in parallel')
-flags.DEFINE_integer('num_environment_steps', 25000000,
+flags.DEFINE_integer('num_environment_steps', 10000000,
                      'Number of environment steps to run before finishing.')
 flags.DEFINE_integer('num_epochs', 25,
                      'Number of epochs for computing policy updates.')
 flags.DEFINE_integer(
-    'collect_episodes_per_iteration', 30,
+    'collect_episodes_per_iteration', 48,
     'The number of episodes to take in the environment before '
     'each update. This is the total across all parallel '
     'environments.')
-flags.DEFINE_integer('num_eval_episodes', 30,
+flags.DEFINE_integer('num_eval_episodes', 500,
                      'The number of episodes to run eval on.')
 flags.DEFINE_boolean('use_rnns', False,
                      'If true, use RNN for policy and value function.')
@@ -82,29 +88,29 @@ FLAGS = flags.FLAGS
 @gin.configurable
 def train_eval(
     root_dir,
-    env_name='HalfCheetah-v2',
-    env_load_fn=suite_mujoco.load,
+    env_name='LoadBalanceDefault-v0',
+    env_load_fn=suite_gym.load,
     random_seed=None,
     # TODO(b/127576522): rename to policy_fc_layers.
     actor_fc_layers=(200, 100),
     value_fc_layers=(200, 100),
     use_rnns=False,
     # Params for collect
-    num_environment_steps=25000000,
-    collect_episodes_per_iteration=30,
-    num_parallel_environments=30,
-    replay_buffer_capacity=1001,  # Per-environment
+    num_environment_steps=10000000,
+    collect_episodes_per_iteration=48,
+    num_parallel_environments=6,
+    replay_buffer_capacity=10000,  # Per-environment
     # Params for train
     num_epochs=25,
     learning_rate=1e-3,
     # Params for eval
-    num_eval_episodes=30,
-    eval_interval=500,
+    num_eval_episodes=500,
+    eval_interval=5000,
     # Params for summaries and logging
-    train_checkpoint_interval=500,
-    policy_checkpoint_interval=500,
-    log_interval=50,
-    summary_interval=50,
+    train_checkpoint_interval=5000,
+    policy_checkpoint_interval=5000,
+    log_interval=500,
+    summary_interval=500,
     summaries_flush_secs=1,
     use_tf_functions=True,
     debug_summaries=False,

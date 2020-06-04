@@ -34,6 +34,21 @@ python tf_agents/agents/dqn/examples/v2/train_eval.py \
   --gin_param='train_eval.env_name="MaskedCartPole-v0"' \
   --gin_param='train_eval.train_sequence_length=10' \
   --alsologtostderr
+
+python tf_agents/agents/dqn/examples/v2/train_eval.py \
+  --root_dir=$HOME/tmp/dqn_rnn/gym/LoadBalanceDefault-v0/ \
+  --gin_param='train_eval.env_name="LoadBalanceDefault-v0"' \
+  --gin_param='train_eval.train_sequence_length=10' \
+  --alsologtostderr
+
+python tf_agents/agents/dqn/examples/v2/train_eval.py \
+  --root_dir=$HOME/tmp/dqn_rnn/gym/LoadBalanceTest-v0/ \
+  --gin_param='train_eval.env_name="LoadBalanceTest-v0"' \
+  --gin_param='train_eval.train_sequence_length=10' \
+  --alsologtostderr
+
+
+
 ```
 
 """
@@ -58,6 +73,7 @@ from tf_agents.drivers import dynamic_step_driver
 from tf_agents.environments import suite_gym
 from tf_agents.environments import tf_py_environment
 from tf_agents.environments.examples import masked_cartpole  # pylint: disable=unused-import
+from tf_agents.environments.load_balance import load_balance # pylint: disable=unused-import
 from tf_agents.eval import metric_utils
 from tf_agents.metrics import tf_metrics
 from tf_agents.networks import q_network
