@@ -37,8 +37,6 @@ tensorflow==2.1.0
 tensorflow-estimator==2.1.0
 tensorflow-probability==0.9.0
 termcolor==1.1.0
-tf-agents-nightly==0.4.0.dev20200604
-tfp-nightly==0.11.0.dev20200603
 urllib3==1.25.9
 Werkzeug==1.0.1
 wrapt==1.12.1
