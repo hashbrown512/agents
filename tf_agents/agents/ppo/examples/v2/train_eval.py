@@ -353,6 +353,7 @@ def main(_):
       for rnn in use_rnns:
           for gc in gradient_clipping:
               run_name = 'run_klfactor' + str(kl) + "_rnn" + str(rnn) + "_gradientclipping" + str(gc)
+              run_name.replace(".", "")
               root_dir = "hyp_tun_run/env_name/" + run_name
               train_eval(
                   root_dir,
@@ -366,7 +367,7 @@ def main(_):
                   num_eval_episodes=num_eval_episodes,
                   eval_interval = eval_interval,
                   kl_cutoff_factor= kl,
-                  gradient_clipping=gradient_clipping,
+                  gradient_clipping=gc,
                   log_interval=log_interval,
                   summary_interval=summary_interval)
 
