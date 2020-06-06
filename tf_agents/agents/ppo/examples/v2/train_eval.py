@@ -126,7 +126,8 @@ def train_eval(
     debug_summaries=False,
     summarize_grads_and_vars=False,
     kl_cutoff_factor=0.0,
-        gradient_clipping=None):
+        gradient_clipping=None,
+        create_step =False):
   """A simple train and eval for PPO."""
   if root_dir is None:
     raise AttributeError('train_eval requires a root_dir.')
@@ -147,7 +148,10 @@ def train_eval(
       tf_metrics.AverageEpisodeLengthMetric(buffer_size=num_eval_episodes)
   ]
 
-  global_step = tf.compat.v1.train.get_or_create_global_step()
+  if create_step:
+    tf.compat.v1.train.create_global_step()
+  else:
+    global_step = tf.compat.v1.train.get_or_create_global_step()
   with tf.compat.v2.summary.record_if(
       lambda: tf.math.equal(global_step % summary_interval, 0)):
     if random_seed is not None:
@@ -317,8 +321,6 @@ def train_eval(
 
 
 def main(_):
-  logging.set_verbosity(logging.INFO)
-  tf.compat.v1.enable_v2_behavior()
 
   # train_eval(
   #     FLAGS.root_dir,
@@ -330,7 +332,6 @@ def main(_):
   #     replay_buffer_capacity=FLAGS.replay_buffer_capacity,
   #     num_epochs=FLAGS.num_epochs,
   #     num_eval_episodes=FLAGS.num_eval_episodes)
-
 
   num_eval_episodes = 10
   eval_interval = 20
@@ -346,15 +347,15 @@ def main(_):
   # kl_cutoff_factor = [1.0, 2.0, 4.0]
   # gradient_clipping = [0.2, 1.0, 5.0]
   kl_cutoff_factor = [1.0, 2.0]
-  gradient_clipping = [0.2, 1.0]
+  gradient_clipping = [0.2]
   num_epochs = 25
   use_rnns = [False, True]
   for kl in kl_cutoff_factor:
       for rnn in use_rnns:
           for gc in gradient_clipping:
               run_name = 'run_klfactor' + str(kl) + "_rnn" + str(rnn) + "_gradientclipping" + str(gc)
-              run_name.replace(".", "")
-              root_dir = "hyp_tun_run/env_name/" + run_name
+              run_name = run_name.replace(".", "")
+              root_dir = "hyp_tun_run/" + env_name + "/" + run_name
               train_eval(
                   root_dir,
                   env_name=env_name,
@@ -371,7 +372,32 @@ def main(_):
                   log_interval=log_interval,
                   summary_interval=summary_interval)
 
-
 if __name__ == '__main__':
   # flags.mark_flag_as_required('root_dir')
   app.run(main)
+
+  # num_eval_episodes = 10
+  # eval_interval = 20
+  # # Have these be order of magnitude less than eval interval
+  # log_interval = 10
+  # summary_interval = 10
+  # num_environment_steps = 200000
+  # # Each episode per step, every eval_interval * episodes is an evaluation
+  # collect_episodes_per_iteration = 10
+  # num_parallel_environments = 7
+  # replay_buffer_capacity = 10000
+  # env_name = "LoadBalanceDefault-v0"
+  # # kl_cutoff_factor = [1.0, 2.0, 4.0]
+  # # gradient_clipping = [0.2, 1.0, 5.0]
+  # kl_cutoff_factor = [1.0, 2.0]
+  # gradient_clipping = [0.2, 1.0]
+  # num_epochs = 25
+  # use_rnns = [False, True]
+  # for kl in kl_cutoff_factor:
+  #     for rnn in use_rnns:
+  #         for gc in gradient_clipping:
+  #             run_name = 'run_klfactor' + str(kl) + "_rnn" + str(rnn) + "_gradientclipping" + str(gc)
+  #             run_name = run_name.replace(".", "")
+  #             root_dir = "hyp_tun_run/" + env_name + "/" + run_name
+  #             app.run(main_run)
+
