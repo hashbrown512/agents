@@ -125,7 +125,7 @@ def train_eval(
     debug_summaries=False,
     summarize_grads_and_vars=False,
     kl_cutoff_factor=0.0,
-        gradient_clipping=None):
+    gradient_clipping=None):
   """A simple train and eval for PPO."""
   if root_dir is None:
     raise AttributeError('train_eval requires a root_dir.')
@@ -317,11 +317,11 @@ def train_eval(
 
 def main(_):
   num_eval_episodes = 200
-  eval_interval = 10
+  eval_interval = 40
   # Have these be order of magnitude less than eval interval
-  log_interval = 5
-  summary_interval = 5
-  num_environment_steps = 10000000
+  log_interval = 10
+  summary_interval = 10
+  num_environment_steps = 5000000
   # Each episode per step, every eval_interval * episodes is an evaluation
   collect_episodes_per_iteration = 64
   num_parallel_environments = 32
