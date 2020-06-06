@@ -36,6 +36,8 @@ python tf_agents/agents/ppo/examples/v2/train_eval.py \
   --num_environment_steps=10000 \
   --logtostderr
   
+  python tf_agents/agents/ppo/examples/v2/train_eval.py \
+  --logtostderr
 ```
 """
 
@@ -122,7 +124,9 @@ def train_eval(
     summaries_flush_secs=1,
     use_tf_functions=True,
     debug_summaries=False,
-    summarize_grads_and_vars=False):
+    summarize_grads_and_vars=False,
+    kl_cutoff_factor=0.0,
+        gradient_clipping=None):
   """A simple train and eval for PPO."""
   if root_dir is None:
     raise AttributeError('train_eval requires a root_dir.')
@@ -186,7 +190,8 @@ def train_eval(
         normalize_observations=True,
         normalize_rewards=True,
         use_gae=True,
-        kl_cutoff_factor=0.0,
+        kl_cutoff_factor=kl_cutoff_factor,
+        gradient_clipping=gradient_clipping,
         initial_adaptive_kl_beta=0.0,
         num_epochs=num_epochs,
         debug_summaries=debug_summaries,
@@ -326,7 +331,7 @@ def main(_):
   #     num_epochs=FLAGS.num_epochs,
   #     num_eval_episodes=FLAGS.num_eval_episodes)
 
-  
+
   num_eval_episodes = 10
   eval_interval = 20
   # Have these be order of magnitude less than eval interval
