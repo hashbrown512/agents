@@ -148,10 +148,7 @@ def train_eval(
       tf_metrics.AverageEpisodeLengthMetric(buffer_size=num_eval_episodes)
   ]
 
-  if create_step:
-    global_step = tf.compat.v1.train.create_global_step()
-  else:
-    global_step = tf.compat.v1.train.get_or_create_global_step()
+  global_step = tf.compat.v1.train.get_or_create_global_step()
   with tf.compat.v2.summary.record_if(
       lambda: tf.math.equal(global_step % summary_interval, 0)):
     if random_seed is not None:
