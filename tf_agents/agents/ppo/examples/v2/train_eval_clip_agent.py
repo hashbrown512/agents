@@ -45,7 +45,7 @@ import tensorflow as tf  # pylint: disable=g-explicit-tensorflow-version-import
 from tf_agents.agents.ppo import ppo_clip_agent
 from tf_agents.drivers import dynamic_episode_driver
 from tf_agents.environments import parallel_py_environment
-from tf_agents.environments.load_balance import load_balance
+from tf_agents.environments.load_balance import load_balance # pylint: disable=unused-import
 from tf_agents.environments import suite_gym
 # from tf_agents.environments import suite_mujoco
 from tf_agents.environments import tf_py_environment
