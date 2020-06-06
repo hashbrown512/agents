@@ -23,6 +23,8 @@ tensorboard --logdir $HOME/tmp/ppo/gym/HalfCheetah-v2/ --port 2223 &
 python tf_agents/agents/ppo/examples/v2/train_eval_clip_agent.py \
   --root_dir=$HOME/tmp/ppo/gym/HalfCheetah-v2/ \
   --logtostderr
+
+python tf_agents/agents/ppo/examples/v2/train_eval_clip_agent.py --logtostderr
 ```
 """
 
@@ -43,7 +45,9 @@ import tensorflow as tf  # pylint: disable=g-explicit-tensorflow-version-import
 from tf_agents.agents.ppo import ppo_clip_agent
 from tf_agents.drivers import dynamic_episode_driver
 from tf_agents.environments import parallel_py_environment
-from tf_agents.environments import suite_mujoco
+from tf_agents.environments.load_balance import load_balance
+from tf_agents.environments import suite_gym
+# from tf_agents.environments import suite_mujoco
 from tf_agents.environments import tf_py_environment
 from tf_agents.eval import metric_utils
 from tf_agents.metrics import tf_metrics
@@ -56,38 +60,38 @@ from tf_agents.replay_buffers import tf_uniform_replay_buffer
 from tf_agents.utils import common
 
 
-flags.DEFINE_string('root_dir', os.getenv('TEST_UNDECLARED_OUTPUTS_DIR'),
-                    'Root directory for writing logs/summaries/checkpoints.')
-flags.DEFINE_string('env_name', 'HalfCheetah-v2', 'Name of an environment')
-flags.DEFINE_integer('replay_buffer_capacity', 1001,
-                     'Replay buffer capacity per env.')
-flags.DEFINE_integer('num_parallel_environments', 30,
-                     'Number of environments to run in parallel')
-flags.DEFINE_integer('num_environment_steps', 25000000,
-                     'Number of environment steps to run before finishing.')
-flags.DEFINE_integer('num_epochs', 25,
-                     'Number of epochs for computing policy updates.')
-flags.DEFINE_integer(
-    'collect_episodes_per_iteration', 30,
-    'The number of episodes to take in the environment before '
-    'each update. This is the total across all parallel '
-    'environments.')
-flags.DEFINE_integer('num_eval_episodes', 30,
-                     'The number of episodes to run eval on.')
-flags.DEFINE_boolean('use_rnns', False,
-                     'If true, use RNN for policy and value function.')
+# flags.DEFINE_string('root_dir', os.getenv('TEST_UNDECLARED_OUTPUTS_DIR'),
+#                     'Root directory for writing logs/summaries/checkpoints.')
+# flags.DEFINE_string('env_name', 'HalfCheetah-v2', 'Name of an environment')
+# flags.DEFINE_integer('replay_buffer_capacity', 1001,
+#                      'Replay buffer capacity per env.')
+# flags.DEFINE_integer('num_parallel_environments', 30,
+#                      'Number of environments to run in parallel')
+# flags.DEFINE_integer('num_environment_steps', 25000000,
+#                      'Number of environment steps to run before finishing.')
+# flags.DEFINE_integer('num_epochs', 25,
+#                      'Number of epochs for computing policy updates.')
+# flags.DEFINE_integer(
+#     'collect_episodes_per_iteration', 30,
+#     'The number of episodes to take in the environment before '
+#     'each update. This is the total across all parallel '
+#     'environments.')
+# flags.DEFINE_integer('num_eval_episodes', 30,
+#                      'The number of episodes to run eval on.')
+# flags.DEFINE_boolean('use_rnns', False,
+#                      'If true, use RNN for policy and value function.')
 FLAGS = flags.FLAGS
 
 
 @gin.configurable
 def train_eval(
     root_dir,
-    env_name='HalfCheetah-v2',
-    env_load_fn=suite_mujoco.load,
+    env_name='LoadBalanceMedium-v0',
+    env_load_fn=suite_gym.load,
     random_seed=None,
     # TODO(b/127576522): rename to policy_fc_layers.
-    actor_fc_layers=(200, 100),
-    value_fc_layers=(200, 100),
+    actor_fc_layers=(100, 50),
+    value_fc_layers=(100, 50),
     use_rnns=False,
     # Params for collect
     num_environment_steps=25000000,
@@ -108,7 +112,9 @@ def train_eval(
     summaries_flush_secs=1,
     use_tf_functions=True,
     debug_summaries=False,
-    summarize_grads_and_vars=False):
+    summarize_grads_and_vars=False,
+    importance_ratio_clipping=0.2,
+    gradient_clipping = None):
   """A simple train and eval for PPO."""
   if root_dir is None:
     raise AttributeError('train_eval requires a root_dir.')
@@ -168,14 +174,15 @@ def train_eval(
         actor_net=actor_net,
         value_net=value_net,
         entropy_regularization=0.0,
-        importance_ratio_clipping=0.2,
-        normalize_observations=False,
-        normalize_rewards=False,
+        importance_ratio_clipping=importance_ratio_clipping,
+        normalize_observations=True,
+        normalize_rewards=True,
         use_gae=True,
         num_epochs=num_epochs,
         debug_summaries=debug_summaries,
         summarize_grads_and_vars=summarize_grads_and_vars,
-        train_step_counter=global_step)
+        train_step_counter=global_step,
+        gradient_clipping=gradient_clipping)
     tf_agent.initialize()
 
     environment_steps_metric = tf_metrics.EnvironmentSteps()
@@ -296,20 +303,46 @@ def train_eval(
 
 
 def main(_):
+  num_eval_episodes = 200
+  eval_interval = 320
+  # Have these be order of magnitude less than eval interval
+  log_interval = 64
+  summary_interval = 64
+  num_environment_steps = 8000000
+  # Each episode per step, every eval_interval * episodes is an evaluation
+  collect_episodes_per_iteration = 8
+  num_parallel_environments = 8
+  replay_buffer_capacity = 10000
+  env_name = "LoadBalanceMedium-v0"
+  num_epochs = 25
+  # env_name = "LoadBalanceDefault-v0"
+  importance_ratio_clipping = [0.1, 0.2, 0.4]
+  gradient_clippings = [10.0, None]
   logging.set_verbosity(logging.INFO)
   tf.compat.v1.enable_v2_behavior()
-  train_eval(
-      FLAGS.root_dir,
-      env_name=FLAGS.env_name,
-      use_rnns=FLAGS.use_rnns,
-      num_environment_steps=FLAGS.num_environment_steps,
-      collect_episodes_per_iteration=FLAGS.collect_episodes_per_iteration,
-      num_parallel_environments=FLAGS.num_parallel_environments,
-      replay_buffer_capacity=FLAGS.replay_buffer_capacity,
-      num_epochs=FLAGS.num_epochs,
-      num_eval_episodes=FLAGS.num_eval_episodes)
-
+  i = 0
+  for irc in importance_ratio_clipping:
+      for gc in gradient_clippings:
+          run_name = 'run_' + str(i) + '_importance_ratio' + str(irc) + "_rnn" + "_gradientclipping" + str(gc)
+          run_name = run_name.replace(".", "")
+          root_dir = "medcliptun/" + env_name + "/" + run_name
+          train_eval(
+              root_dir,
+              env_name='LoadBalanceMedium-v0',
+              use_rnns=False,
+              num_environment_steps=num_environment_steps,
+              collect_episodes_per_iteration=collect_episodes_per_iteration,
+              num_parallel_environments=num_parallel_environments,
+              replay_buffer_capacity=replay_buffer_capacity,
+              num_epochs=num_epochs,
+              num_eval_episodes=num_eval_episodes,
+              log_interval= log_interval,
+              eval_interval = eval_interval,
+              summary_interval= summary_interval,
+              importance_ratio_clipping=irc,
+              gradient_clipping = gc)
+          i+=1
 
 if __name__ == '__main__':
-  flags.mark_flag_as_required('root_dir')
+  # flags.mark_flag_as_required('root_dir')
   app.run(main)
