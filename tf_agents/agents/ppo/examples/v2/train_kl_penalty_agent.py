@@ -317,19 +317,19 @@ def train_eval(
     )
 
 def main(_):
-  # num_eval_episodes = 300
-  # eval_interval = 160
-  # # Have these be order of magnitude less than eval interval
-  # log_interval = 32
-  # summary_interval = 32
-  # num_environment_steps = 10000000
-
-  num_eval_episodes = 10
-  eval_interval = 3
+  num_eval_episodes = 300
+  eval_interval = 160
   # Have these be order of magnitude less than eval interval
-  log_interval = 1
-  summary_interval = 1
-  num_environment_steps = 20000
+  log_interval = 32
+  summary_interval = 32
+  num_environment_steps = 10000000
+
+  # num_eval_episodes = 10
+  # eval_interval = 3
+  # # Have these be order of magnitude less than eval interval
+  # log_interval = 1
+  # summary_interval = 1
+  # num_environment_steps = 20000
 
 
   collect_episodes_per_iteration = 32
