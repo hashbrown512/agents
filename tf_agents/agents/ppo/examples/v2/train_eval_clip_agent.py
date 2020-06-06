@@ -308,7 +308,7 @@ def main(_):
   # Have these be order of magnitude less than eval interval
   log_interval = 64
   summary_interval = 64
-  num_environment_steps = 8000000
+  num_environment_steps = 10000
   # Each episode per step, every eval_interval * episodes is an evaluation
   collect_episodes_per_iteration = 8
   num_parallel_environments = 8
