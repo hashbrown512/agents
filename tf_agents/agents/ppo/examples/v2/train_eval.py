@@ -330,21 +330,21 @@ def main(_):
   #     num_epochs=FLAGS.num_epochs,
   #     num_eval_episodes=FLAGS.num_eval_episodes)
 
-  num_eval_episodes = 10
-  eval_interval = 20
+  num_eval_episodes = 100
+  eval_interval = 100
   # Have these be order of magnitude less than eval interval
-  log_interval = 10
-  summary_interval = 10
-  num_environment_steps = 200000
+  log_interval = 50
+  summary_interval = 50
+  num_environment_steps = 30000000
   # Each episode per step, every eval_interval * episodes is an evaluation
-  collect_episodes_per_iteration = 10
-  num_parallel_environments = 7
+  collect_episodes_per_iteration = 24
+  num_parallel_environments = 8
   replay_buffer_capacity = 10000
   env_name = "LoadBalanceDefault-v0"
-  # kl_cutoff_factor = [1.0, 2.0, 4.0]
-  # gradient_clipping = [0.2, 1.0, 5.0]
-  kl_cutoff_factor = [1.0, 2.0]
-  gradient_clipping = [0.2]
+  kl_cutoff_factor = [1.0, 2.0, 4.0]
+  gradient_clipping = [0.2, 1.0, 5.0]
+  # kl_cutoff_factor = [1.0, 2.0]
+  # gradient_clipping = [0.2]
   num_epochs = 25
   use_rnns = [False, True]
   for kl in kl_cutoff_factor:
