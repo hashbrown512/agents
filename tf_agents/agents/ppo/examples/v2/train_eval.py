@@ -365,7 +365,7 @@ def main(_):
                   num_epochs=num_epochs,
                   num_eval_episodes=num_eval_episodes,
                   eval_interval = eval_interval,
-                  kl_cutoff_factor= kl_cutoff_factor,
+                  kl_cutoff_factor= kl,
                   gradient_clipping=gradient_clipping,
                   log_interval=log_interval,
                   summary_interval=summary_interval)
