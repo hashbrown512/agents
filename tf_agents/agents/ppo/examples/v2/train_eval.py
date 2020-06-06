@@ -372,11 +372,11 @@ def main(_):
               create_step=True)
 
 def multiple_main():
-    num_eval_episodes = 100
-    eval_interval = 100
+    num_eval_episodes = 200
+    eval_interval = 1000
     # Have these be order of magnitude less than eval interval
-    log_interval = 50
-    summary_interval = 50
+    log_interval = 200
+    summary_interval = 200
     num_environment_steps = 30000000
     # Each episode per step, every eval_interval * episodes is an evaluation
     collect_episodes_per_iteration = 24
