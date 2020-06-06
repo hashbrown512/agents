@@ -149,7 +149,7 @@ def train_eval(
   ]
 
   if create_step:
-    tf.compat.v1.train.create_global_step()
+    global_step = tf.compat.v1.train.create_global_step()
   else:
     global_step = tf.compat.v1.train.get_or_create_global_step()
   with tf.compat.v2.summary.record_if(
@@ -370,7 +370,8 @@ def main(_):
                   kl_cutoff_factor= kl,
                   gradient_clipping=gc,
                   log_interval=log_interval,
-                  summary_interval=summary_interval)
+                  summary_interval=summary_interval,
+              create_step=True)
 
 if __name__ == '__main__':
   # flags.mark_flag_as_required('root_dir')
