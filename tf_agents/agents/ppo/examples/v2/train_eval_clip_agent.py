@@ -303,19 +303,28 @@ def train_eval(
 
 
 def main(_):
-  num_eval_episodes = 200
-  eval_interval = 320
+  # num_eval_episodes = 200
+  # eval_interval = 320
+  # # Have these be order of magnitude less than eval interval
+  # log_interval = 64
+  # summary_interval = 64
+  # num_environment_steps = 10000
+  # # Each episode per step, every eval_interval * episodes is an evaluation
+  # collect_episodes_per_iteration = 8
+
+  num_eval_episodes = 10
+  eval_interval = 3
   # Have these be order of magnitude less than eval interval
-  log_interval = 64
-  summary_interval = 64
-  num_environment_steps = 10000
+  log_interval = 1
+  summary_interval = 1
+  num_environment_steps = 20000
   # Each episode per step, every eval_interval * episodes is an evaluation
   collect_episodes_per_iteration = 8
+
   num_parallel_environments = 8
   replay_buffer_capacity = 10000
   env_name = "LoadBalanceMedium-v0"
   num_epochs = 25
-  # env_name = "LoadBalanceDefault-v0"
   importance_ratio_clipping = [0.1, 0.2, 0.4]
   gradient_clippings = [10.0, None]
   logging.set_verbosity(logging.INFO)
