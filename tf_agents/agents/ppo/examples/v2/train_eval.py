@@ -356,6 +356,7 @@ def main(_):
               run_name = 'run_klfactor' + str(kl) + "_rnn" + str(rnn) + "_gradientclipping" + str(gc)
               run_name = run_name.replace(".", "")
               root_dir = "hyp_tun_run/" + env_name + "/" + run_name
+
               train_eval(
                   root_dir,
                   env_name=env_name,
@@ -373,9 +374,53 @@ def main(_):
                   summary_interval=summary_interval,
               create_step=True)
 
+def multiple_main():
+    num_eval_episodes = 10
+    eval_interval = 20
+    # Have these be order of magnitude less than eval interval
+    log_interval = 10
+    summary_interval = 10
+    num_environment_steps = 200000
+    # Each episode per step, every eval_interval * episodes is an evaluation
+    collect_episodes_per_iteration = 10
+    num_parallel_environments = 7
+    replay_buffer_capacity = 10000
+    env_name = "LoadBalanceDefault-v0"
+    # kl_cutoff_factor = [1.0, 2.0, 4.0]
+    # gradient_clipping = [0.2, 1.0, 5.0]
+    kl_cutoff_factor = [1.0, 2.0]
+    gradient_clipping = [0.2]
+    num_epochs = 25
+    use_rnns = [False, True]
+    for kl in kl_cutoff_factor:
+        for rnn in use_rnns:
+            for gc in gradient_clipping:
+                run_name = 'run_klfactor' + str(kl) + "_rnn" + str(rnn) + "_gradientclipping" + str(gc)
+                run_name = run_name.replace(".", "")
+                root_dir = "hyp_tun_run/" + env_name + "/" + run_name
+
+                def main_func(_):
+                    train_eval(
+                        root_dir,
+                        env_name=env_name,
+                        use_rnns=rnn,
+                        num_environment_steps=num_environment_steps,
+                        collect_episodes_per_iteration=collect_episodes_per_iteration,
+                        num_parallel_environments=num_parallel_environments,
+                        replay_buffer_capacity=replay_buffer_capacity,
+                        num_epochs=num_epochs,
+                        num_eval_episodes=num_eval_episodes,
+                        eval_interval=eval_interval,
+                        kl_cutoff_factor=kl,
+                        gradient_clipping=gc,
+                        log_interval=log_interval,
+                        summary_interval=summary_interval,
+                        create_step=True)
+                app.run(main_func)
 if __name__ == '__main__':
   # flags.mark_flag_as_required('root_dir')
-  app.run(main)
+  # app.run(main)
+  multiple_main()
 
   # num_eval_episodes = 10
   # eval_interval = 20
