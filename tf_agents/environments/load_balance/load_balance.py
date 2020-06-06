@@ -302,3 +302,16 @@ register(
   max_episode_steps=1001,
   reward_threshold=-500,
 )
+
+service_rates_medium = (0.5, 0.75, 1.0, 1.25, 1.5)
+num_servers_medium = len(service_rates_medium)
+kwargs_medium = {"add_time": True, "load_state": True, "normalize": False, "num_stream_jobs": 250,
+          "service_rates": service_rates_medium, "num_servers": num_servers_medium, "job_size_pareto_scale": 45}
+
+register(
+  id='LoadBalanceMedium-v0',
+  entry_point=LoadBalanceEnv,
+  max_episode_steps=251,
+  reward_threshold=-250,
+  kwargs=kwargs_medium
+)

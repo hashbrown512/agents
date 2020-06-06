@@ -36,8 +36,7 @@ python tf_agents/agents/ppo/examples/v2/train_eval.py \
   --num_environment_steps=10000 \
   --logtostderr
   
-  python tf_agents/agents/ppo/examples/v2/train_eval.py \
-  --logtostderr
+  python tf_agents/agents/ppo/examples/v2/train_eval.py --logtostderr
 ```
 """
 
@@ -318,41 +317,30 @@ def train_eval(
 
 
 def main(_):
-
-  # train_eval(
-  #     FLAGS.root_dir,
-  #     env_name=FLAGS.env_name,
-  #     use_rnns=FLAGS.use_rnns,
-  #     num_environment_steps=FLAGS.num_environment_steps,
-  #     collect_episodes_per_iteration=FLAGS.collect_episodes_per_iteration,
-  #     num_parallel_environments=FLAGS.num_parallel_environments,
-  #     replay_buffer_capacity=FLAGS.replay_buffer_capacity,
-  #     num_epochs=FLAGS.num_epochs,
-  #     num_eval_episodes=FLAGS.num_eval_episodes)
-
-  num_eval_episodes = 150
-  eval_interval = 1000
+  num_eval_episodes = 200
+  eval_interval = 10
   # Have these be order of magnitude less than eval interval
-  log_interval = 250
-  summary_interval = 250
-  num_environment_steps = 30000000
+  log_interval = 5
+  summary_interval = 5
+  num_environment_steps = 10000000
   # Each episode per step, every eval_interval * episodes is an evaluation
-  collect_episodes_per_iteration = 24
-  num_parallel_environments = 8
+  collect_episodes_per_iteration = 64
+  num_parallel_environments = 32
   replay_buffer_capacity = 10000
-  env_name = "LoadBalanceDefault-v0"
+  env_name = "LoadBalanceMedium-v0"
   kl_cutoff_factor = [1.0, 2.0, 4.0]
   gradient_clipping = [0.2, 1.0, 5.0]
   # kl_cutoff_factor = [1.0, 2.0]
   # gradient_clipping = [0.2]
   num_epochs = 25
   use_rnns = [False, True]
+  i =0
   for kl in kl_cutoff_factor:
       for rnn in use_rnns:
           for gc in gradient_clipping:
-              run_name = 'run_klfactor' + str(kl) + "_rnn" + str(rnn) + "_gradientclipping" + str(gc)
+              run_name = 'run_' + str(i)  + '_klfactor' + str(kl) + "_rnn" + str(rnn) + "_gradientclipping" + str(gc)
               run_name = run_name.replace(".", "")
-              root_dir = "hyp_tun_run/" + env_name + "/" + run_name
+              root_dir = "medtunhyp/" + env_name + "/" + run_name
 
               train_eval(
                   root_dir,
@@ -369,7 +357,8 @@ def main(_):
                   gradient_clipping=gc,
                   log_interval=log_interval,
                   summary_interval=summary_interval,
-              create_step=True)
+                create_step=True)
+              i += 1
 
 # def multiple_main():
 #     num_eval_episodes = 200
