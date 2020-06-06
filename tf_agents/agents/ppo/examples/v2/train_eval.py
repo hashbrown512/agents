@@ -25,7 +25,15 @@ python tf_agents/agents/ppo/examples/v2/train_eval.py \
   --logtostderr
   
 python tf_agents/agents/ppo/examples/v2/train_eval.py \
-  --root_dir=logs/LoadBalanceDefault-v0/run1 \
+  --root_dir=logsppo/LoadBalanceDefault-v0/run2 \
+  --num_parallel_environments=7 \
+  --num_environment_steps=80000000 \
+  --logtostderr
+  
+python tf_agents/agents/ppo/examples/v2/train_eval.py \
+  --root_dir=YOO/LoadBalanceDefault-v0/run2 \
+  --num_parallel_environments=1 \
+  --num_environment_steps=10000 \
   --logtostderr
   
 ```
@@ -67,9 +75,9 @@ flags.DEFINE_string('root_dir', os.getenv('TEST_UNDECLARED_OUTPUTS_DIR'),
 flags.DEFINE_string('env_name', 'LoadBalanceDefault-v0', 'Name of an environment')
 flags.DEFINE_integer('replay_buffer_capacity', 20001,
                      'Replay buffer capacity per env.')
-flags.DEFINE_integer('num_parallel_environments', 6,
+flags.DEFINE_integer('num_parallel_environments', 1,
                      'Number of environments to run in parallel')
-flags.DEFINE_integer('num_environment_steps', 10000000,
+flags.DEFINE_integer('num_environment_steps', 100000,
                      'Number of environment steps to run before finishing.')
 flags.DEFINE_integer('num_epochs', 25,
                      'Number of epochs for computing policy updates.')
@@ -78,7 +86,7 @@ flags.DEFINE_integer(
     'The number of episodes to take in the environment before '
     'each update. This is the total across all parallel '
     'environments.')
-flags.DEFINE_integer('num_eval_episodes', 500,
+flags.DEFINE_integer('num_eval_episodes', 100,
                      'The number of episodes to run eval on.')
 flags.DEFINE_boolean('use_rnns', False,
                      'If true, use RNN for policy and value function.')
@@ -96,9 +104,9 @@ def train_eval(
     value_fc_layers=(200, 100),
     use_rnns=False,
     # Params for collect
-    num_environment_steps=10000000,
+    num_environment_steps=80000000,
     collect_episodes_per_iteration=48,
-    num_parallel_environments=6,
+    num_parallel_environments=7,
     replay_buffer_capacity=10000,  # Per-environment
     # Params for train
     num_epochs=25,
@@ -107,10 +115,10 @@ def train_eval(
     num_eval_episodes=500,
     eval_interval=5000,
     # Params for summaries and logging
-    train_checkpoint_interval=5000,
-    policy_checkpoint_interval=5000,
-    log_interval=500,
-    summary_interval=500,
+    train_checkpoint_interval=500,
+    policy_checkpoint_interval=500,
+    log_interval=50,
+    summary_interval=50,
     summaries_flush_secs=1,
     use_tf_functions=True,
     debug_summaries=False,
@@ -175,8 +183,8 @@ def train_eval(
         value_net=value_net,
         entropy_regularization=0.0,
         importance_ratio_clipping=0.2,
-        normalize_observations=False,
-        normalize_rewards=False,
+        normalize_observations=True,
+        normalize_rewards=True,
         use_gae=True,
         kl_cutoff_factor=0.0,
         initial_adaptive_kl_beta=0.0,
@@ -306,18 +314,58 @@ def train_eval(
 def main(_):
   logging.set_verbosity(logging.INFO)
   tf.compat.v1.enable_v2_behavior()
-  train_eval(
-      FLAGS.root_dir,
-      env_name=FLAGS.env_name,
-      use_rnns=FLAGS.use_rnns,
-      num_environment_steps=FLAGS.num_environment_steps,
-      collect_episodes_per_iteration=FLAGS.collect_episodes_per_iteration,
-      num_parallel_environments=FLAGS.num_parallel_environments,
-      replay_buffer_capacity=FLAGS.replay_buffer_capacity,
-      num_epochs=FLAGS.num_epochs,
-      num_eval_episodes=FLAGS.num_eval_episodes)
+
+  # train_eval(
+  #     FLAGS.root_dir,
+  #     env_name=FLAGS.env_name,
+  #     use_rnns=FLAGS.use_rnns,
+  #     num_environment_steps=FLAGS.num_environment_steps,
+  #     collect_episodes_per_iteration=FLAGS.collect_episodes_per_iteration,
+  #     num_parallel_environments=FLAGS.num_parallel_environments,
+  #     replay_buffer_capacity=FLAGS.replay_buffer_capacity,
+  #     num_epochs=FLAGS.num_epochs,
+  #     num_eval_episodes=FLAGS.num_eval_episodes)
+
+  
+  num_eval_episodes = 10
+  eval_interval = 20
+  # Have these be order of magnitude less than eval interval
+  log_interval = 10
+  summary_interval = 10
+  num_environment_steps = 200000
+  # Each episode per step, every eval_interval * episodes is an evaluation
+  collect_episodes_per_iteration = 10
+  num_parallel_environments = 7
+  replay_buffer_capacity = 10000
+  env_name = "LoadBalanceDefault-v0"
+  # kl_cutoff_factor = [1.0, 2.0, 4.0]
+  # gradient_clipping = [0.2, 1.0, 5.0]
+  kl_cutoff_factor = [1.0, 2.0]
+  gradient_clipping = [0.2, 1.0]
+  num_epochs = 25
+  use_rnns = [False, True]
+  for kl in kl_cutoff_factor:
+      for rnn in use_rnns:
+          for gc in gradient_clipping:
+              run_name = 'run_klfactor' + str(kl) + "_rnn" + str(rnn) + "_gradientclipping" + str(gc)
+              root_dir = "hyp_tun_run/env_name/" + run_name
+              train_eval(
+                  root_dir,
+                  env_name=env_name,
+                  use_rnns=rnn,
+                  num_environment_steps=num_environment_steps,
+                  collect_episodes_per_iteration=collect_episodes_per_iteration,
+                  num_parallel_environments=num_parallel_environments,
+                  replay_buffer_capacity=replay_buffer_capacity,
+                  num_epochs=num_epochs,
+                  num_eval_episodes=num_eval_episodes,
+                  eval_interval = eval_interval,
+                  kl_cutoff_factor= kl_cutoff_factor,
+                  gradient_clipping=gradient_clipping,
+                  log_interval=log_interval,
+                  summary_interval=summary_interval)
 
 
 if __name__ == '__main__':
-  flags.mark_flag_as_required('root_dir')
+  # flags.mark_flag_as_required('root_dir')
   app.run(main)

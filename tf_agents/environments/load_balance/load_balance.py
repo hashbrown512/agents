@@ -300,5 +300,5 @@ register(
   id='LoadBalanceDefault-v0',
   entry_point=LoadBalanceEnv,
   max_episode_steps=1001,
-  reward_threshold=100000000,
+  reward_threshold=-500,
 )
