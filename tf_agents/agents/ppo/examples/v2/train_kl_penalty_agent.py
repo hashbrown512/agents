@@ -24,7 +24,7 @@ python tf_agents/agents/ppo/examples/v2/train_eval_clip_agent.py \
   --root_dir=$HOME/tmp/ppo/gym/HalfCheetah-v2/ \
   --logtostderr
 
-python tf_agents/agents/ppo/examples/v2/train_eval_clip_agent.py --logtostderr
+python tf_agents/agents/ppo/examples/v2/train_kl_penalty_agent.py --logtostderr
 ```
 """
 
@@ -115,7 +115,8 @@ def train_eval(
     summaries_flush_secs=1,
     use_tf_functions=True,
     debug_summaries=False,
-    summarize_grads_and_vars=False):
+    summarize_grads_and_vars=False,
+    gradient_clipping = None):
   """A simple train and eval for PPO."""
   if root_dir is None:
     raise AttributeError('train_eval requires a root_dir.')
@@ -180,6 +181,7 @@ def train_eval(
         optimizer,
         normalize_observations=True,
         normalize_rewards=True,
+        gradient_clipping=gradient_clipping
     )
     # tf_agent = ppo_clip_agent.PPOClipAgent(
     #     tf_env.time_step_spec(),
