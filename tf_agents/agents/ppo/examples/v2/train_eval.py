@@ -419,8 +419,8 @@ def multiple_main():
                 app.run(main_func)
 if __name__ == '__main__':
   # flags.mark_flag_as_required('root_dir')
-  # app.run(main)
-  multiple_main()
+  app.run(main)
+  # multiple_main()
 
   # num_eval_episodes = 10
   # eval_interval = 20
