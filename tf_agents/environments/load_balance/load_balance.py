@@ -77,7 +77,7 @@ class LoadBalanceEnv(gym.Env):
                  load_balance_obs_high=500000.0,
                  normalize=False,
                  add_time=False,
-                 load_state=False,
+                 load_state=True,
                  seed=42):
         self.normalize = normalize
         self.add_time = add_time
@@ -295,6 +295,13 @@ class LoadBalanceEnv(gym.Env):
         return state if not self.normalize else self.state_normalizer.normalize(state), reward, done, {
             'curr_time': self.wall_time.curr_time, 'jobs': jobs}
 
+class MediumLoadBalanceEnv(LoadBalanceEnv):
+    def __init__(self):
+        service_rates = (0.5, 0.75, 1.0, 1.25, 1.5)
+        super().__init__(load_state = True,num_stream_jobs=250,
+                                             job_size_pareto_scale=45,
+                                             service_rates = service_rates,
+                                             num_servers = len(service_rates))
 
 register(
   id='LoadBalanceDefault-v0',
@@ -303,15 +310,22 @@ register(
   reward_threshold=-500,
 )
 
-service_rates_medium = (0.5, 0.75, 1.0, 1.25, 1.5)
-num_servers_medium = len(service_rates_medium)
-kwargs_medium = {"add_time": True, "load_state": True, "normalize": False, "num_stream_jobs": 250,
-          "service_rates": service_rates_medium, "num_servers": num_servers_medium, "job_size_pareto_scale": 45}
-
 register(
   id='LoadBalanceMedium-v0',
-  entry_point=LoadBalanceEnv,
+  entry_point=MediumLoadBalanceEnv,
   max_episode_steps=251,
   reward_threshold=-250,
-  kwargs=kwargs_medium
 )
+
+# service_rates_medium = (0.5, 0.75, 1.0, 1.25, 1.5)
+# num_servers_medium = len(service_rates_medium)
+# kwargs_medium = {"load_state": True, "normalize": False, "num_stream_jobs": 250,
+#           "service_rates": service_rates_medium, "num_servers": num_servers_medium, "job_size_pareto_scale": 45}
+#
+# register(
+#   id='LoadBalanceMedium-v0',
+#   entry_point=LoadBalanceEnv,
+#   max_episode_steps=251,
+#   reward_threshold=-250,
+#   kwargs=kwargs_medium
+# )

@@ -125,8 +125,7 @@ def train_eval(
     debug_summaries=False,
     summarize_grads_and_vars=False,
     kl_cutoff_factor=0.0,
-        gradient_clipping=None,
-        create_step =False):
+        gradient_clipping=None):
   """A simple train and eval for PPO."""
   if root_dir is None:
     raise AttributeError('train_eval requires a root_dir.')
@@ -328,6 +327,7 @@ def main(_):
   num_parallel_environments = 32
   replay_buffer_capacity = 10000
   env_name = "LoadBalanceMedium-v0"
+  # env_name = "LoadBalanceDefault-v0"
   kl_cutoff_factor = [1.0, 2.0, 4.0]
   gradient_clipping = [0.2, 1.0, 5.0]
   # kl_cutoff_factor = [1.0, 2.0]
@@ -356,8 +356,7 @@ def main(_):
                   kl_cutoff_factor= kl,
                   gradient_clipping=gc,
                   log_interval=log_interval,
-                  summary_interval=summary_interval,
-                create_step=True)
+                  summary_interval=summary_interval)
               i += 1
 
 # def multiple_main():
