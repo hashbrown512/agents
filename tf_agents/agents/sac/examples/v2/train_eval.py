@@ -27,6 +27,10 @@ tensorboard --logdir $HOME/tmp/sac/gym/HalfCheetah-v2/ --port 2223 &
 python tf_agents/agents/sac/examples/v2/train_eval.py \
   --root_dir=$HOME/tmp/sac/gym/HalfCheetah-v2/ \
   --alsologtostderr
+
+  python tf_agents/agents/sac/examples/v2/train_eval.py \
+  --root_dir=logssac/LoadBalanceDefault-v0/run1 \
+  --logtostderr
 ```
 """
 
@@ -45,11 +49,12 @@ import gin
 from six.moves import range
 import tensorflow as tf  # pylint: disable=g-explicit-tensorflow-version-import
 
+from tf_agents.environments.load_balance import load_balance # pylint: disable=unused-import
 from tf_agents.agents.ddpg import critic_network
 from tf_agents.agents.sac import sac_agent
 from tf_agents.agents.sac import tanh_normal_projection_network
 from tf_agents.drivers import dynamic_step_driver
-from tf_agents.environments import suite_mujoco
+from tf_agents.environments import suite_gym
 from tf_agents.environments import tf_py_environment
 from tf_agents.eval import metric_utils
 from tf_agents.metrics import tf_metrics
@@ -71,14 +76,14 @@ FLAGS = flags.FLAGS
 @gin.configurable
 def train_eval(
     root_dir,
-    env_name='HalfCheetah-v2',
+    env_name='LoadBalanceDefault-v0',
     eval_env_name=None,
-    env_load_fn=suite_mujoco.load,
+    env_load_fn=suite_gym.load,
     # The SAC paper reported:
     # Hopper and Cartpole results up to 1000000 iters,
     # Humanoid results up to 10000000 iters,
     # Other mujoco tasks up to 3000000 iters.
-    num_iterations=3000000,
+    num_iterations=10000,
     actor_fc_layers=(256, 256),
     critic_obs_fc_layers=None,
     critic_action_fc_layers=None,
@@ -90,7 +95,7 @@ def train_eval(
     # Different choices roughly keep the initial episodes about the same.
     initial_collect_steps=10000,
     collect_steps_per_iteration=1,
-    replay_buffer_capacity=1000000,
+    replay_buffer_capacity=500000,
     # Params for target update
     target_update_tau=0.005,
     target_update_period=1,
