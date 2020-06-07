@@ -439,4 +439,10 @@ def default_main(_):
 
 if __name__ == '__main__':
   # flags.mark_flag_as_required('root_dir')
-  app.run(main)
+  # app.run(main)
+  app.run(default_main)
+
+
+"""
+python tf_agents/agents/ppo/examples/v2/train_kl_penalty_agent.py --logtostderr
+"""
