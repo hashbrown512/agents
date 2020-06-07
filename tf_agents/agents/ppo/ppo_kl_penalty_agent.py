@@ -85,7 +85,7 @@ class PPOKLPenaltyAgent(ppo_agent.PPOAgent):
                log_prob_clipping=0.0,
                gradient_clipping=None,
                kl_cutoff_coef=0.0,
-               kl_cutoff_factor=None,
+               kl_cutoff_factor=0.0,
                check_numerics=False,
                debug_summaries=False,
                summarize_grads_and_vars=False,
