@@ -388,7 +388,7 @@ def default_main(_):
   collect_episodes_per_iteration = 8
   num_parallel_environments = 8
   replay_buffer_capacity = 10000
-  env_name = "LoadBalanceMedium-v0"
+  env_name = "LoadBalanceDefault-v0"
   num_epochs = 25
   # env_name = "LoadBalanceDefault-v0"
   adaptive_kl_target = [0.001, 0.01, 0.1, 0.2, 0.4]
@@ -408,7 +408,7 @@ def default_main(_):
               adaptive_kl_target = ikl_target,
               # from suggested
               adaptive_kl_tolerance = 0.5,
-              env_name='LoadBalanceDefault-v0',
+              env_name=env_name,
               use_rnns=False,
               num_environment_steps=num_environment_steps,
               collect_episodes_per_iteration=collect_episodes_per_iteration,
