@@ -375,7 +375,7 @@ def default_main(_):
   # Have these be order of magnitude less than eval interval
   log_interval = 32
   summary_interval = 32
-  num_environment_steps = 60000000
+  num_environment_steps = 50000000
 
   # num_eval_episodes = 10
   # eval_interval = 3
@@ -387,18 +387,18 @@ def default_main(_):
 
   collect_episodes_per_iteration = 8
   num_parallel_environments = 8
-  replay_buffer_capacity = 10000
+  replay_buffer_capacity = 20000
   env_name = "LoadBalanceDefault-v0"
   num_epochs = 25
   # env_name = "LoadBalanceDefault-v0"
-  adaptive_kl_target = [0.001, 0.01, 0.1, 0.2, 0.4]
+  adaptive_kl_target = [0.2, 0.4, 0.8]
   gradient_clippings = [10.0]
   logging.set_verbosity(logging.INFO)
   tf.compat.v1.enable_v2_behavior()
-  i = 0
+  i = 10
   for ikl_target in adaptive_kl_target:
       for gc in gradient_clippings:
-          run_name = 'run_' + str(i) + '_adaptive_kl_target' + str(ikl_target) + "_rnn" + "_gradientclipping" + str(gc)
+          run_name = 'run_50m_' + str(i) + '_adaptive_kl_target' + str(ikl_target) + "_rnn" + "_gradientclipping" + str(gc)
           run_name = run_name.replace(".", "")
           root_dir = "medklpenalty60/" + env_name + "/" + run_name
           train_eval(
