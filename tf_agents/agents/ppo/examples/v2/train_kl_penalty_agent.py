@@ -317,12 +317,12 @@ def train_eval(
     )
 
 def main(_):
-  num_eval_episodes = 300
-  eval_interval = 160
+  num_eval_episodes = 500
+  eval_interval = 256
   # Have these be order of magnitude less than eval interval
   log_interval = 32
   summary_interval = 32
-  num_environment_steps = 10000000
+  num_environment_steps = 20000000
 
   # num_eval_episodes = 10
   # eval_interval = 3
@@ -332,14 +332,14 @@ def main(_):
   # num_environment_steps = 20000
 
 
-  collect_episodes_per_iteration = 32
-  num_parallel_environments = 32
+  collect_episodes_per_iteration = 8
+  num_parallel_environments = 8
   replay_buffer_capacity = 10000
   env_name = "LoadBalanceMedium-v0"
   num_epochs = 25
   # env_name = "LoadBalanceDefault-v0"
   adaptive_kl_target = [0.001, 0.01, 0.1, 0.2, 0.4]
-  gradient_clippings = [10.0, None]
+  gradient_clippings = [10.0]
   logging.set_verbosity(logging.INFO)
   tf.compat.v1.enable_v2_behavior()
   i = 0
@@ -347,7 +347,7 @@ def main(_):
       for gc in gradient_clippings:
           run_name = 'run_' + str(i) + '_adaptive_kl_target' + str(ikl_target) + "_rnn" + "_gradientclipping" + str(gc)
           run_name = run_name.replace(".", "")
-          root_dir = "medklpenalty_tun/" + env_name + "/" + run_name
+          root_dir = "medkltun20/" + env_name + "/" + run_name
           train_eval(
               root_dir,
               # from suggested
@@ -368,6 +368,60 @@ def main(_):
               summary_interval= summary_interval,
               gradient_clipping = gc)
           i+=1
+
+def default_main(_):
+  num_eval_episodes = 500
+  eval_interval = 320
+  # Have these be order of magnitude less than eval interval
+  log_interval = 32
+  summary_interval = 32
+  num_environment_steps = 60000000
+
+  # num_eval_episodes = 10
+  # eval_interval = 3
+  # # Have these be order of magnitude less than eval interval
+  # log_interval = 1
+  # summary_interval = 1
+  # num_environment_steps = 20000
+
+
+  collect_episodes_per_iteration = 8
+  num_parallel_environments = 8
+  replay_buffer_capacity = 10000
+  env_name = "LoadBalanceMedium-v0"
+  num_epochs = 25
+  # env_name = "LoadBalanceDefault-v0"
+  adaptive_kl_target = [0.001, 0.01, 0.1, 0.2, 0.4]
+  gradient_clippings = [10.0]
+  logging.set_verbosity(logging.INFO)
+  tf.compat.v1.enable_v2_behavior()
+  i = 0
+  for ikl_target in adaptive_kl_target:
+      for gc in gradient_clippings:
+          run_name = 'run_' + str(i) + '_adaptive_kl_target' + str(ikl_target) + "_rnn" + "_gradientclipping" + str(gc)
+          run_name = run_name.replace(".", "")
+          root_dir = "medklpenalty60/" + env_name + "/" + run_name
+          train_eval(
+              root_dir,
+              # from suggested
+              initial_adaptive_kl_beta = 1.0,
+              adaptive_kl_target = ikl_target,
+              # from suggested
+              adaptive_kl_tolerance = 0.5,
+              env_name='LoadBalanceDefault-v0',
+              use_rnns=False,
+              num_environment_steps=num_environment_steps,
+              collect_episodes_per_iteration=collect_episodes_per_iteration,
+              num_parallel_environments=num_parallel_environments,
+              replay_buffer_capacity=replay_buffer_capacity,
+              num_epochs=num_epochs,
+              num_eval_episodes=num_eval_episodes,
+              log_interval= log_interval,
+              eval_interval = eval_interval,
+              summary_interval= summary_interval,
+              gradient_clipping = gc)
+          i+=1
+
 
 # def main(_):
 #   logging.set_verbosity(logging.INFO)
