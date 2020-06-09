@@ -375,7 +375,7 @@ def default_main(_):
   # Have these be order of magnitude less than eval interval
   log_interval = 32
   summary_interval = 32
-  num_environment_steps = 40000000
+  num_environment_steps = 70000000
 
   # num_eval_episodes = 10
   # eval_interval = 3
@@ -391,11 +391,11 @@ def default_main(_):
   env_name = "LoadBalanceDefault-v0"
   num_epochs = 25
   # env_name = "LoadBalanceDefault-v0"
-  adaptive_kl_target = [0.01, 0.2, 1.0]
-  gradient_clippings = [5.0, 1.0, 15.0]
+  adaptive_kl_target = [0.01, 0.05]
+  gradient_clippings = [5.0, 10.0]
   logging.set_verbosity(logging.INFO)
   tf.compat.v1.enable_v2_behavior()
-  i = 30
+  i = 45
   for ikl_target in adaptive_kl_target:
       for gc in gradient_clippings:
           run_name = 'run_50m_' + str(i) + '_adaptive_kl_target' + str(ikl_target) + "_rnn" + "_gradientclipping" + str(gc)
