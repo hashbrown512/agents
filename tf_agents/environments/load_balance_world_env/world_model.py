@@ -181,11 +181,11 @@ class LoadBalanceWorldEnv250(LoadBalanceWorldEnv):
 
         super().__init__(num_servers = 5,
                           num_steps = 250,
-                          reward_predictor_path = os.path.join(dir_name, "world_model/reward_weights/weights.hdf5"),
+                          reward_predictor_path = os.path.join(env_dir, "rewweights.hdf5"),
                           reward_predictor_model_func = make_model,
                           x_scalar_reward = x_scalar_reward,
                           rew_scalar = rew_scalar,
-                          state_predictor_path = os.path.join(dir_name, "world_model/state_weights/weights.hdf5"),
+                          state_predictor_path = os.path.join(env_dir, "stateweights.hdf5"),
                           x_state_scalar = x_state_scalar,
                           y_state_scalar = y_state_scalar,
                           load_sampler_data  = load_sampler_data ,
