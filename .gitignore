@@ -8,3 +8,5 @@ __pycache__
 *.swp
 .vscode/
 .idea/
+**/sasr.npz
+**/state_prediction.npz

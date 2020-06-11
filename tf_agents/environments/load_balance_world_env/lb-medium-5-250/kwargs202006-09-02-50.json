@@ -1,0 +1,15 @@
+{
+  "add_time": true,
+  "load_state": true,
+  "normalize": false,
+  "num_stream_jobs": 250,
+  "service_rates": [
+    0.5,
+    0.75,
+    1.0,
+    1.25,
+    1.5
+  ],
+  "num_servers": 5,
+  "job_size_pareto_scale": 45
+}
