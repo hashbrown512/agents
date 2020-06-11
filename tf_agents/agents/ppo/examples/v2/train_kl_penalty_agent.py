@@ -371,12 +371,12 @@ def train_eval(
 #           i+=1
 
 def world_main(_):
-  num_eval_episodes = 100
+  num_eval_episodes = 2
   eval_interval = 320
   # Have these be order of magnitude less than eval interval
   log_interval = 32
   summary_interval = 32
-  num_environment_steps = 2000000
+  num_environment_steps = 1000
 
   # num_eval_episodes = 10
   # eval_interval = 3
@@ -386,8 +386,8 @@ def world_main(_):
   # num_environment_steps = 20000
 
 
-  collect_episodes_per_iteration = 8
-  num_parallel_environments = 8
+  collect_episodes_per_iteration = 1
+  num_parallel_environments = 1
   replay_buffer_capacity = 20000
   env_name = "LBWorldModel250-v0"
   num_epochs = 25

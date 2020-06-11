@@ -1,5 +1,8 @@
 import numpy as np
 import os
+import os.path
+from os import path
+import wget
 
 from tf_agents.environments.load_balance_world_env.helpers import state_prediction_tuning, pred_func_sasr, load_state_prediction_data
 from tf_agents.environments.load_balance_world_env.helper_rew import reward_prediction_tuning, load_data_sasr
@@ -140,6 +143,10 @@ class LoadBalanceWorldEnv250(LoadBalanceWorldEnv):
     def __init__(self):
         dir_name = os.path.dirname(__file__)
         env_dir = os.path.join(dir_name, "lb-medium-5-250")
+        if not os.path.exists(os.path.join(dir_name, "lb-medium-5-250/sasr.npz")):
+            wget.download('https://www.dropbox.com/s/q0bvbycyglb850o/state_prediction.npz?dl=1',
+                          out='state_prediction.npz')
+            wget.download('https://www.dropbox.com/s/qqa3n51skc3ge4d/sasr.npz?dl=1', out='sasr.npz')
         rates_for_final_state = np.array([0.5, 0.75, 1.0, 1.25, 1.5])
         batch_size = 512
         seq_len = 250
